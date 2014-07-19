@@ -1,19 +1,23 @@
-@(comments: List[models.Comment])
+@(comments: List[models.Comment]) 
+
 
 @main("Ajax Comment") {
 
 <form class="form-inline" id="comment-form">
-  <input type="text" id="input-comment" placeholder="comment" />
-  <button type="submit" id="comment-submit">post</button>
+	<input type="text" id="input-comment" placeholder="comment" />
+	<button type="submit" id="comment-submit">post</button>
 </form>
 
 <ul id="comments">
-  @comments.map { comment =>
-    <li>@comment.comment</li>
-  }
-<ul>
+	@comments.map { comment =>
 
-<script>
+	<li id=@comment.id>@comment.comment<button type='button' class="itemDelete">x</button></li>
+	
+	}
+	<ul>
+
+		<script>
+		deleteCommentBind();
 $('#comment-form').submit(function(event) {
   event.preventDefault();
   var comment = $("#input-comment").val();
@@ -26,13 +30,56 @@ $('#comment-form').submit(function(event) {
     },
     success: function(datetime) {
       $("#input-comment").val("");
-      $('#comments').append("<li>" + comment + "</li>")
+      console.log(datetime);
+      
+      $('#comments').append("<li id="+datetime.id+">" + comment + "<button type='button' class='itemDelete'>x</button></li>")
+      deleteCommentBind();
     },
     error: function() {
       alert("error")
     }
   })
 });
-</script>
 
+function deleteCommentBind()
+{
+$('#comments .itemDelete').bind('click', function() {
+    
+	var commentId = $(this).closest('li').attr('id');
+	console.log(commentId);
+	$(this).closest('li').remove();
+	
+	 jsRoutes.controllers.Application.deleteComment(commentId).ajax({
+	    beforeSend: function() {
+	    	console.log('before send');
+	    },
+	    complete: function() {
+	    	console.log('after complete');
+	    },
+	    success: function(datetime) {
+	      console.log('success');
+	    },
+	    error: function() {
+	      alert("error")
+	    }
+	  })
+    
+});
+}
+
+
+var oriVal;
+$("#comments").on('dblclick', 'li', function () {
+    oriVal = $(this).text();
+    $(this).text("");
+    $("<input type='text'>").appendTo(this).focus();
+});
+
+$("#comments").on('focusout', 'li > input', function () {
+    var $this = $(this);
+    $this.parent().text($this.val() || oriVal);
+    $this.remove(); // Don't just hide, remove the element.
+});
+
+</script>
 }

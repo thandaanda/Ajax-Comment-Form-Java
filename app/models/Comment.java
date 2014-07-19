@@ -21,13 +21,16 @@ public class Comment extends Model {
 	public static final Finder<Long, Comment> find = new Finder<Long, Comment>(
 			Long.class, Comment.class);
 
-	public static void create(String comment2) {
+	public static Comment create(String comment2) {
 		// TODO Auto-generated method stub
 		final Comment comment = new Comment();
 		comment.comment = comment2;
 		comment.save();
+		return comment;
 		
 	}
+
+	
 	
 	
 	
